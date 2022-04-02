@@ -4,29 +4,20 @@ import {
     Table,
     Button,
     Tag,
-    Space,
     Form,
     Input,
-    Radio   ,
-    Select,
     Col,
     Checkbox,
-    Row
+    Row,
+    Space
 } from 'antd'
 
+import { SearchOutlined } from '@ant-design/icons';
 import LinkButton from '../../components/link-button/link-button';
 import {PlusCircleOutlined} from '@ant-design/icons';
-import testData from "../../data/dev_test_json_4tuples.js"
 import api from '../../api';
-import axios from 'axios';
-import ajax from '../../api/ajax';
-import { responsiveArray } from 'antd/lib/_util/responsiveObserve';
-import { FormInstance } from 'antd/es/form';
 
 
-
-
-const { Option } = Select;
 const layout = {
     labelCol: {
         span:2,
@@ -40,115 +31,155 @@ const tailLayout = {
       offset: 2,
     },
   };
-const priceLayout = {
 
-    wrapperCol: {
-      span:5,
-    },
-  };
 export default class Info extends Component {
     
     state={
         information: [],
-        dataSource: []}
+        dataSource: [],
+        searchText: '',
+        searchedColumn: '',}
+
+        getColumnSearchProps = dataIndex => ({
+            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+              <div style={{ padding: 8 }}>
+                <Input
+                  ref={node => {
+                    this.searchInput = node;
+                  }}
+                  placeholder={`Search ${dataIndex}`}
+                  value={selectedKeys[0]}
+                  onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                  onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+                  style={{ marginBottom: 8, display: 'block' }}
+                />
+                <Space>
+                  <Button
+                    type="primary"
+                    onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+                    icon={<SearchOutlined />}
+                    size="small"
+                    style={{ width: 90 }}
+                  >
+                    Search
+                  </Button>
+                  <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+                    Reset
+                  </Button>
+                  <Button
+                    type="link"
+                    size="small"
+                    onClick={() => {
+                      confirm({ closeDropdown: false });
+                      this.setState({
+                        searchText: selectedKeys[0],
+                        searchedColumn: dataIndex,
+                      });
+                    }}
+                  >
+                    Filter
+                  </Button>
+                </Space>
+              </div>
+            ),
+            filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+            onFilter: (value, record) =>
+              record[dataIndex]
+                ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+                : '',
+            onFilterDropdownVisibleChange: visible => {
+              if (visible) {
+                setTimeout(() => this.searchInput.select(), 100);
+              }
+            },
+            render: text =>
+                (
+                text
+              ),
+          });
+        
+          handleSearch = (selectedKeys, confirm, dataIndex) => {
+            confirm();
+            this.setState({
+              searchText: selectedKeys[0],
+              searchedColumn: dataIndex,
+            });
+          };
+        
+          handleReset = clearFilters => {
+            clearFilters();
+            this.setState({ searchText: '' });
+          };
+
+
+
 
     
-    getFireBaseObj =  () =>{
+    // getFireBaseObj =  () =>{
 
-        // try {
-        //     const data = await api.get('/result.json?orderBy="$key"&limitToFirst=15')
-        // } catch (error) {      
-        // }
-            api.get('/result.json?orderBy="$key"&limitToFirst=15').then(response=>{
-            localStorage.setItem('firebaseObj',JSON.stringify(response.data))
-            // console.log([JSON.parse(localStorage.getItem('firebaseObj'))][0])
-            this.setState({dataSource:[JSON.parse(localStorage.getItem('firebaseObj'))][0]})
+    //     // try {
+    //     //     const data = await api.get('/result.json?orderBy="$key"&limitToFirst=15')
+    //     // } catch (error) {      
+    //     // }
+    //         api.get('/result.json?orderBy="$key"&limitToFirst=15').then(response=>{
+    //         localStorage.setItem('firebaseObj',JSON.stringify(response.data))
+    //         // console.log([JSON.parse(localStorage.getItem('firebaseObj'))][0])
+    //         this.setState({dataSource:[JSON.parse(localStorage.getItem('firebaseObj'))][0]})
             
-            localStorage.removeItem("firebaseObj");
+    //         localStorage.removeItem("firebaseObj");
             
-        })
+    //     })
         
         
-    }
+    // }
 
     
 
     initColumns = () => {
         this.columns = [
-            // {
-            //   title:'No.',
-            //   dataIndex:'uid',
-            //   key:'uid'
-            // },
+
             {
-                title: 'AddressLine1',
-                dataIndex: 'addrline1',
-                key: 'addrline1'
+                title: 'Address',
+                dataIndex: 'address',
+                key: 'address',
+                ...this.getColumnSearchProps('address'),
             },
             {
-                title: 'AddressLine2',
-                dataIndex: 'addrline2',
-                key: 'addrline2',
-                filters: [
-                        {
-                          text: 'Encino',
-                          value: 'Encino',
-                        },
-                        {
-                          text: 'Northridge',
-                          value: 'Northridge',
-                        },
-                      ],
-                    filterMode: 'tree',
-                    filterSearch: true,
-                    onFilter: (value, record) => record.addrline2.includes(value),
-                    width: '30%',
-                    //   onFilter: (value, record) => record.addrline2.indexOf(value) === 0
+                title: 'Amenities',
+                dataIndex: 'amenities',
+                key: 'amenities',
+                render: tags => (
+                    <>
+                      {tags.map(tag => {
+                        let color = tag.length > 5 ? 'geekblue' : 'green';
+                        if (tag.includes('Washer') || tag.includes('Air Conditioning')||
+                        tag.includes('Dryer')
+                        ) {
+                          color = 'green';
+                          return (
+                            <Tag color={color} key={tag}>
+                              {tag.toUpperCase()}
+                            </Tag>
+                          );
+                        }
+                        else {
+                            color = 'red';
+                            return (
+                              <Tag color={color} key={tag}>
+                                {tag.toUpperCase()}
+                              </Tag>
+                            );
+                          }
+                      })}
+                    </>
+                  ),
             },
-            // {
-            //     title: 'Amenities',
-            //     dataIndex: 'amenities',
-            //     key: 'amenities',
-            //     render: tags => (
-            //         <>
-            //           {tags.map(tag => {
-            //             let color = tag.length > 5 ? 'geekblue' : 'green';
-            //             if (tag.includes('Washer') || tag.includes('Air Conditioning')||
-            //             tag.includes('Dryer')
-            //             ) {
-            //               color = 'green';
-            //               return (
-            //                 <Tag color={color} key={tag}>
-            //                   {tag.toUpperCase()}
-            //                 </Tag>
-            //               );
-            //             }
-            //             else {
-            //                 color = 'red';
-            //                 return (
-            //                   <Tag color={color} key={tag}>
-            //                     {tag.toUpperCase()}
-            //                   </Tag>
-            //                 );
-            //               }
-            //           })}
-            //         </>
-            //       ),
-            // },
-        
-            {
-                title: 'House Type',
-                dataIndex: 'house_info',
-                key: 'house-info'
-                
-            },
+
             {
                 title: 'Price',
                 dataIndex: 'rental_price',
                 key: 'rental_price',
-                // sorter: (a, b) => a.rental_price - b.rental_price
                 sorter: (a, b) => a.rental_price - b.rental_price,
-                // sorter: (a, b) => Number(a.rental_price.substring(1)) - Number(b.rental_price.substring(1)),
             },
             {
                 title: 'Action',
@@ -185,32 +216,40 @@ export default class Info extends Component {
         const title = 'Rental Intro'
         const { dataSource } = this.state;
         const onFinish = async(values) => {
+            console.log(values)
             //搜索框实现
-            console.log(typeof values.address)
             try {
-                const b = '/house?addr=' + (values.address) + '&distRange=' + values.distRange +'&priceRange=' +values.lprice+ ','+ values.hprice + '&amenities=Washer,Air Conditioning';
                 
-                console.log(b);
-                const data = await api.post((b))
-                // const data = await api.post(
-                //     '/house',{params:
-                //     {
-                //         'addr' : values.address,
-                //         'distRange': values.distRange,
-                //         'priceRange': values.lprice + ',' + values.hprice,
-                //         'amenities': 'Washer'
-                //     }}
-                // );
-                console.log(data);
+                const data = await api.get(
+                    '/house',{params:
+                    {
+                        'addr' : values.address,
+                        'distRange': values.distRange,
+                        'priceRange': values.lprice + ',' + values.hprice,
+                        'amenities': values.amenities.toString()
+                    }}
+                );
+                const data_front_format = []
+                for (var i=0;i<data.data.data.length;i++)
+                    { 
+                        const each_obj = {"address":data.data.data[i].location.formattedAddr, 
+                        "amenities":data.data.data[i].amenities, 
+                        "rental_price":data.data.data[i].rental_price,
+                        }
+                        data_front_format.push(each_obj)
+                    }
+                
+                this.setState({dataSource:data_front_format})
+                console.log(data.data.data);
             } catch (error) {      
                 console.log('error!!')    
             }
 
             };
-            
-        const onFinishFailed = (errorInfo) => {
-            console.log('Failed:', errorInfo);
-            };
+         
+        // const onFinishFailed = (errorInfo) => {
+        //     console.log('Failed:', errorInfo);
+        //     };
     
         const extra = (
             <Button
@@ -223,7 +262,7 @@ export default class Info extends Component {
             <span>Updata from FireBase</span>
             </Button>
         )
-        
+          
         return (
             <Card title={title} extra={extra}>
                 <Form {...layout} ref={this.formRef} name="control-ref" onFinish={onFinish} onSubmit={this.handleSubmit}     >
@@ -290,23 +329,24 @@ export default class Info extends Component {
                         <Row>
                             <Col span={8}>
                             <Checkbox
-                                value="A"
+                                value="Washer"
                                 style={{
                                 lineHeight: '32px',
                                 }}
                             >
-                                A
+                                Washer
                             </Checkbox>
                             </Col>
-                            <Col span={8}>
+                            <Col span={20}>
                             <Checkbox
-                                value="B"
+                                value="Air Conditioning"
                                 style={{
+                                
                                 lineHeight: '32px',
                                 }}
                                 // disabled
                             >
-                                B
+                                Air Conditioning
                             </Checkbox>
                             </Col>
                             <Col span={8}>
@@ -354,23 +394,12 @@ export default class Info extends Component {
                     </Form.Item>
                     <Form.Item
                     noStyle
-                    shouldUpdate={(prevValues, currentValues) => prevValues.gender !== currentValues.gender}
                     >
+                        
                     {({ getFieldValue }) =>
-                        getFieldValue('gender') === 'other' ? (
-                        <Form.Item
-                            name="customizeGender"
-                            label="Customize Gender"
-                            rules={[
-                            {
-                                required: true,
-                            },
-                            ]}
-                        >
-                            <Input />
-                        </Form.Item>
-                        ) : null
+                        null
                     }
+
                     </Form.Item>
                     <Form.Item {...tailLayout}>
                     <Button type="primary" htmlType="submit">
