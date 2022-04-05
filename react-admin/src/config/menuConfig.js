@@ -10,6 +10,7 @@ import {
     DotChartOutlined,
     OrderedListOutlined,
     HomeTwoTone,
+    TeamOutlined,
     MailOutlined,
   } from '@ant-design/icons';
 const menuList = [
@@ -23,6 +24,11 @@ const menuList = [
         title: 'Rental Info',
         key: '/info',
         icon: <OrderedListOutlined />
+    },
+    {
+        title: 'Roommates',
+        key: '/mate',
+        icon: <TeamOutlined />
     },
     {
         title: 'Analysis',

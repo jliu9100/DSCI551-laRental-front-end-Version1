@@ -16,7 +16,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import LinkButton from '../../components/link-button/link-button';
 import {PlusCircleOutlined} from '@ant-design/icons';
 import api from '../../api';
-
+import testData from '../../data/dev_test_json_4tuples';
 
 const layout = {
     labelCol: {
@@ -33,164 +33,167 @@ const tailLayout = {
   };
 
 export default class Info extends Component {
+
     
-    state={
+  state={
         information: [],
-        dataSource: [],
+        dataSource: testData,
         searchText: '',
-        searchedColumn: '',}
+        searchedColumn: '',
+        hyperlinkTo: 'http://www.baidu.com'}
 
-        getColumnSearchProps = dataIndex => ({
-            filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-              <div style={{ padding: 8 }}>
-                <Input
-                  ref={node => {
-                    this.searchInput = node;
-                  }}
-                  placeholder={`Search ${dataIndex}`}
-                  value={selectedKeys[0]}
-                  onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                  onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-                  style={{ marginBottom: 8, display: 'block' }}
-                />
-                <Space>
-                  <Button
-                    type="primary"
-                    onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-                    icon={<SearchOutlined />}
-                    size="small"
-                    style={{ width: 90 }}
-                  >
-                    Search
-                  </Button>
-                  <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
-                    Reset
-                  </Button>
-                  <Button
-                    type="link"
-                    size="small"
-                    onClick={() => {
-                      confirm({ closeDropdown: false });
-                      this.setState({
-                        searchText: selectedKeys[0],
-                        searchedColumn: dataIndex,
-                      });
-                    }}
-                  >
-                    Filter
-                  </Button>
-                </Space>
-              </div>
-            ),
-            filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
-            onFilter: (value, record) =>
-              record[dataIndex]
-                ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
-                : '',
-            onFilterDropdownVisibleChange: visible => {
-              if (visible) {
-                setTimeout(() => this.searchInput.select(), 100);
-              }
-            },
-            render: text =>
-                (
-                text
-              ),
-          });
-        
-          handleSearch = (selectedKeys, confirm, dataIndex) => {
-            confirm();
-            this.setState({
-              searchText: selectedKeys[0],
-              searchedColumn: dataIndex,
-            });
-          };
-        
-          handleReset = clearFilters => {
-            clearFilters();
-            this.setState({ searchText: '' });
-          };
+  getColumnSearchProps = dataIndex => ({
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            ref={node => {
+              this.searchInput = node;
+            }}
+            placeholder={`Search ${dataIndex}`}
+            value={selectedKeys[0]}
+            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+            style={{ marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+              icon={<SearchOutlined />}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Search
+            </Button>
+            <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+              Reset
+            </Button>
+            <Button
+              type="link"
+              size="small"
+              onClick={() => {
+                confirm({ closeDropdown: false });
+                this.setState({
+                  searchText: selectedKeys[0],
+                  searchedColumn: dataIndex,
+                });
+              }}
+            >
+              Filter
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) =>
+        record[dataIndex]
+          ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+          : '',
+      onFilterDropdownVisibleChange: visible => {
+        if (visible) {
+          setTimeout(() => this.searchInput.select(), 100);
+        }
+      },
+      render: text =>
+          (
+          text
+        ),
+    });
+  
+  handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    this.setState({
+      searchText: selectedKeys[0],
+      searchedColumn: dataIndex,
+    });
+  };
 
+  handleReset = clearFilters => {
+    clearFilters();
+    this.setState({ searchText: '' });
+  };
 
+  redirect = (HouseObj) =>{
+    console.log(HouseObj)
+    const w=window.open('about:blank');
+    w.location.href = "/mate?"+ HouseObj.addrline1;
+  }
+  // getFireBaseObj =  () =>{
 
+  //     // try {
+  //     //     const data = await api.get('/result.json?orderBy="$key"&limitToFirst=15')
+  //     // } catch (error) {      
+  //     // }
+  //         api.get('/result.json?orderBy="$key"&limitToFirst=15').then(response=>{
+  //         localStorage.setItem('firebaseObj',JSON.stringify(response.data))
+  //         // console.log([JSON.parse(localStorage.getItem('firebaseObj'))][0])
+  //         this.setState({dataSource:[JSON.parse(localStorage.getItem('firebaseObj'))][0]})
+          
+  //         localStorage.removeItem("firebaseObj");
+          
+  //     })
+      
+      
+  // }
 
     
-    // getFireBaseObj =  () =>{
 
-    //     // try {
-    //     //     const data = await api.get('/result.json?orderBy="$key"&limitToFirst=15')
-    //     // } catch (error) {      
-    //     // }
-    //         api.get('/result.json?orderBy="$key"&limitToFirst=15').then(response=>{
-    //         localStorage.setItem('firebaseObj',JSON.stringify(response.data))
-    //         // console.log([JSON.parse(localStorage.getItem('firebaseObj'))][0])
-    //         this.setState({dataSource:[JSON.parse(localStorage.getItem('firebaseObj'))][0]})
-            
-    //         localStorage.removeItem("firebaseObj");
-            
-    //     })
-        
-        
-    // }
-
-    
-
-    initColumns = () => {
+  initColumns = () => {
+      
         this.columns = [
 
-            {
-                title: 'Address',
-                dataIndex: 'address',
-                key: 'address',
-                ...this.getColumnSearchProps('address'),
-            },
-            {
-                title: 'Amenities',
-                dataIndex: 'amenities',
-                key: 'amenities',
-                render: tags => (
-                    <>
-                      {tags.map(tag => {
-                        let color = tag.length > 5 ? 'geekblue' : 'green';
-                        if (tag.includes('Washer') || tag.includes('Air Conditioning')||
-                        tag.includes('Dryer')
-                        ) {
-                          color = 'green';
+          {
+              title: 'Address',
+              dataIndex: 'address',
+              key: 'address',
+              ...this.getColumnSearchProps('address'),
+          },
+          {
+              title: 'Amenities',
+              dataIndex: 'amenities',
+              key: 'amenities',
+              render: tags => (
+                  <>
+                    {tags.map(tag => {
+                      let color = tag.length > 5 ? 'geekblue' : 'green';
+                      if (tag.includes('Washer') || tag.includes('Air Conditioning')||
+                      tag.includes('Dryer')
+                      ) {
+                        color = 'green';
+                        return (
+                          <Tag color={color} key={tag}>
+                            {tag.toUpperCase()}
+                          </Tag>
+                        );
+                      }
+                      else {
+                          color = 'red';
                           return (
                             <Tag color={color} key={tag}>
                               {tag.toUpperCase()}
                             </Tag>
                           );
                         }
-                        else {
-                            color = 'red';
-                            return (
-                              <Tag color={color} key={tag}>
-                                {tag.toUpperCase()}
-                              </Tag>
-                            );
-                          }
-                      })}
-                    </>
-                  ),
-            },
+                    })}
+                  </>
+                ),
+          },
 
-            {
-                title: 'Price',
-                dataIndex: 'rental_price',
-                key: 'rental_price',
-                sorter: (a, b) => a.rental_price - b.rental_price,
-            },
-            {
-                title: 'Action',
-                width: 300,
-                dataIndex:'',
-                render: ()=> (<span>
-                    <LinkButton>ShowMore</LinkButton>
-                    <LinkButton>SourceWeb</LinkButton>
-                    </span>)
-                
-            }
+          {
+              title: 'Price',
+              dataIndex: 'rental_price',
+              key: 'rental_price',
+              sorter: (a, b) => a.rental_price - b.rental_price,
+          },
+          {
+              title: 'Action',
+              width: 300,
+              dataIndex:'',
+              render: (HouseObj)=> (<span>
+                  <LinkButton onClick = {()=>{this.redirect(HouseObj)}}>FindRoommate</LinkButton>
+                  </span>)
+              
+          }
         
         
         ]
@@ -214,12 +217,10 @@ export default class Info extends Component {
 
     render() {
         const title = 'Rental Intro'
-        const { dataSource } = this.state;
+        const { dataSource} = this.state;
+        //搜索框实现
         const onFinish = async(values) => {
-            console.log(values)
-            //搜索框实现
-            try {
-                
+            try {              
                 const data = await api.get(
                     '/house',{params:
                     {
@@ -240,12 +241,10 @@ export default class Info extends Component {
                     }
                 
                 this.setState({dataSource:data_front_format})
-                console.log(data.data.data);
             } catch (error) {      
                 console.log('error!!')    
             }
-
-            };
+          };
          
         // const onFinishFailed = (errorInfo) => {
         //     console.log('Failed:', errorInfo);
@@ -256,7 +255,7 @@ export default class Info extends Component {
             type="primary"
             icon={<PlusCircleOutlined />}
             // loading={loadings[1]}
-            onClick={this.getFireBaseObj}
+            // onClick={}
             
           >
             <span>Updata from FireBase</span>
@@ -410,7 +409,17 @@ export default class Info extends Component {
                     </Button>
                     </Form.Item>
                 </Form>
-                <Table className='info-table' dataSource={dataSource} columns={this.columns} />;
+                <Table 
+                className='info-table' 
+                dataSource={dataSource} 
+                columns={this.columns} 
+                rowKey="addrline1"
+                expandable={{
+                  // onExpand: 
+                  expandedRowRender: record => <p style={{ margin: 0 }}>{"Roommate：0/3, click Button on the right to FindRoommate!"}</p>,
+                  rowExpandable: record => record.addrline1 !== 'Not Expandable',
+                }}
+                />;
             </Card>
         )
     }

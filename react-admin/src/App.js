@@ -12,6 +12,7 @@ import Info from './pages/info/info';
 import Bar from './pages/charts/bar';
 import Line from './pages/charts/line';
 import Pie from './pages/charts/pie';
+import Mate from './pages/mate/mate';
 export default class App extends Component {
 
   render () {
@@ -23,6 +24,7 @@ export default class App extends Component {
           <Route path='/' element ={<Admin/>}>
             <Route path='home' element = {<Home/>}/>
             <Route path='info' element = {<Info/>}/>
+            <Route path='mate' element = {<Mate/>}/>
             <Route path='charts/bar' element = {<Bar/>}/>
             <Route path='charts/line' element = {<Line/>}/>
             <Route path='charts/pie' element = {<Pie/>}/>
